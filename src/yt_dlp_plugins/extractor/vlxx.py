@@ -2,8 +2,8 @@ import re
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
-import yt_dlp.downloader.fragment
-from yt_dlp.downloader.fragment import FragmentFD
+import yt_dlp.downloader.hls
+from yt_dlp.downloader.hls import HlsFD
 from yt_dlp.extractor.common import InfoExtractor
 from yt_dlp.utils import js_to_json, traverse_obj, urlencode_postdata
 
@@ -71,11 +71,11 @@ class VlxxIE(InfoExtractor):
         }
 
 
-class PngStripFD(FragmentFD):
+class PngStripFD(HlsFD):
     def _append_fragment(self, ctx, frag_content):
         frag_content = frag_content[9:]
         super()._append_fragment(ctx, frag_content)
 
 
 # wont work on windows bundled yt-dlp
-yt_dlp.downloader.fragment.FragmentFD = PngStripFD
+yt_dlp.downloader.hls.HlsFD = PngStripFD
