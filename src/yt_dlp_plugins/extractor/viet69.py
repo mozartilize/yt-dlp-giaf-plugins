@@ -1,21 +1,19 @@
 import re
-from typing import override, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
 from yt_dlp.extractor.common import InfoExtractor
 from yt_dlp.utils import ExtractorError
 from yt_dlp.extractor.blogger import BloggerIE
-from yt_dlp.utils import js_to_json, traverse_obj, urlencode_postdata
+from yt_dlp.utils import urlencode_postdata
 
 if TYPE_CHECKING:
     from yt_dlp.extractor.common import _InfoDict
 
 
-# class Viet69IE(InfoExtractor):
 class Viet69IE(InfoExtractor):
     _VALID_URL = r"https?:\/\/viet69\.[a-z]+\/[\w\.\-]+\/?"
 
-    @override
     def _real_extract(self, url) -> "_InfoDict":
         video_id = "unknown"
         parsed_url = urlparse(url)

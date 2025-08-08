@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
 import yt_dlp.downloader.fragment
@@ -14,7 +14,6 @@ if TYPE_CHECKING:
 class VlxxIE(InfoExtractor):
     _VALID_URL = r"https?:\/\/vlxx\.[a-z]+\/video\/[\w\.\-]+\/(?P<id>\d+)\/?"
 
-    @override
     def _real_extract(self, url) -> "_InfoDict":
         video_id = self._match_id(url)
         parsed_url = urlparse(url)
@@ -78,4 +77,5 @@ class PngStripFD(FragmentFD):
         super()._append_fragment(ctx, frag_content)
 
 
+# wont work on windows bundled yt-dlp
 yt_dlp.downloader.fragment.FragmentFD = PngStripFD
