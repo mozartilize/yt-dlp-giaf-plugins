@@ -1,7 +1,7 @@
 [project]
 name = "yt-dlp-giaf-plugins"
 version = "0.1.0"
-description = "Add your description here"
+description = ""
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -11,11 +11,16 @@ dependencies = [
 [dependency-groups]
 dev = ["types-yt-dlp>=2025.7.21.20250728"]
 
+# [tool.uv.sources]
+# yt-dlp = { path = "../yt-dlp", editable = true }
+
 [tool.uv.build-backend]
+module-root = ""
+namespace = true
 module-name = [
-    "yt_dlp_plugins.extractor.vlxx",
-    "yt_dlp_plugins.extractor.viet69",
+    "yt_dlp_plugins.extractor",
 ]
 
-[tool.uv.sources]
-yt-dlp = { path = "../yt-dlp", editable = true }
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
