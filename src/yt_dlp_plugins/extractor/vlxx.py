@@ -2,17 +2,66 @@ import re
 from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
-import yt_dlp.downloader.hls
-from yt_dlp.downloader.hls import HlsFD
+from yt_dlp.downloader import (
+    _get_suitable_downloader,  # noqa
+    get_suitable_downloader,
+)
+import yt_dlp.downloader
+from yt_dlp.downloader.dash import DashSegmentsFD  # noqa
+from yt_dlp.downloader.external import FFmpegFD  # noqa
 from yt_dlp.extractor.common import InfoExtractor
-from yt_dlp.utils import js_to_json, traverse_obj, urlencode_postdata
+from yt_dlp.utils import (
+    NO_DEFAULT,
+    determine_protocol,  # noqa
+    js_to_json,
+    traverse_obj,
+    urlencode_postdata,
+)
 
 if TYPE_CHECKING:
     from yt_dlp.extractor.common import _InfoDict
 
 
+def get_suitable_downloader_orig(
+    info_dict, params={}, default=NO_DEFAULT, protocol=None, to_stdout=False
+):
+    pass
+
+get_suitable_downloader_orig.__code__ = get_suitable_downloader.__code__
+yt_dlp.downloader.get_suitable_downloader_orig = get_suitable_downloader_orig
+
+
+def get_suitable_downloader_patch(
+    info_dict, params={}, default=NO_DEFAULT, protocol=None, to_stdout=False
+):
+    fd = get_suitable_downloader_orig(info_dict, params, default, protocol, to_stdout)
+    from yt_dlp.downloader.hls import HlsFD
+
+    if fd is HlsFD:
+        class PngStripFD(HlsFD):
+            def _append_fragment(self, ctx, frag_content):
+                frag_content = frag_content[8:]
+                super()._append_fragment(ctx, frag_content)
+
+        return PngStripFD
+    return fd
+
+
 class VlxxIE(InfoExtractor):
     _VALID_URL = r"https?:\/\/vlxx\.[a-z]+\/video\/[\w\.\-]+\/(?P<id>\d+)\/?"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        import gc
+        xx = next(
+            filter(
+                lambda o: hasattr(o, "__name__")
+                and o.__name__ == "get_suitable_downloader",
+                gc.get_objects(),
+            )
+        )
+        xx.__code__ = get_suitable_downloader_patch.__code__
 
     def _real_extract(self, url) -> "_InfoDict":
         video_id = self._match_id(url)
@@ -69,13 +118,3 @@ class VlxxIE(InfoExtractor):
                 "Referer": referer,
             },
         }
-
-
-class PngStripFD(HlsFD):
-    def _append_fragment(self, ctx, frag_content):
-        frag_content = frag_content[9:]
-        super()._append_fragment(ctx, frag_content)
-
-
-# wont work on windows bundled yt-dlp
-yt_dlp.downloader.hls.HlsFD = PngStripFD

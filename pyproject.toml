@@ -3,8 +3,10 @@ name = "yt-dlp-giaf-plugins"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = ["yt-dlp>=2025.7.21"]
+requires-python = ">=3.10"
+dependencies = [
+    "yt-dlp>=2025.7.21",
+]
 
 [dependency-groups]
 dev = ["types-yt-dlp>=2025.7.21.20250728"]
@@ -14,3 +16,6 @@ module-name = [
     "yt_dlp_plugins.extractor.vlxx",
     "yt_dlp_plugins.extractor.viet69",
 ]
+
+[tool.uv.sources]
+yt-dlp = { path = "../yt-dlp", editable = true }
